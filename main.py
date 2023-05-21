@@ -48,9 +48,9 @@ RED_HIT = pygame.USEREVENT + 2
 #end Spaceships
 
 def Yellow_movement(keys_pressed, yellow):
-    if keys_pressed[pygame.K_w and yellow.y > 0]:
+    if keys_pressed[pygame.K_w] and yellow.y > 0:
         yellow.y -= VELOCITY
-    if keys_pressed[pygame.K_s and yellow.y < WINDOW_HEIGHT]:
+    if keys_pressed[pygame.K_s] and yellow.y < WINDOW_HEIGHT - SPACESHIP_WIDTH:
         yellow.y += VELOCITY
     if keys_pressed[pygame.K_a] and yellow.x > yellow.height / 2:
         yellow.x -= VELOCITY
@@ -58,9 +58,9 @@ def Yellow_movement(keys_pressed, yellow):
         yellow.x += VELOCITY
 
 def Red_movement(keys_pressed, red):
-    if keys_pressed[pygame.K_UP and red.y > 0]:
+    if keys_pressed[pygame.K_UP] and red.y > 0:
         red.y -= VELOCITY
-    if keys_pressed[pygame.K_DOWN and red.y < WINDOW_HEIGHT]:
+    if keys_pressed[pygame.K_DOWN] and red.y < WINDOW_HEIGHT - SPACESHIP_WIDTH:
         red.y += VELOCITY
     if keys_pressed[pygame.K_LEFT] and red.x > WINDOW_WIDTH / 2 + red.width:
         red.x -= VELOCITY
@@ -90,9 +90,7 @@ def Draw_window(yellow, red, yellow_bullets, red_bullets, yellow_health, red_hea
 
     pygame.display.update()
 
-
 def Handle_bullets(yellow_bullets: List[pygame.Rect], red_bullets: list, yellow: pygame.Rect, red: pygame.Rect):
-
     for bullet in yellow_bullets:
         bullet.x += BULLET_VELOCITY
         if red.colliderect(bullet):
@@ -110,12 +108,13 @@ def Handle_bullets(yellow_bullets: List[pygame.Rect], red_bullets: list, yellow:
             red_bullets.remove(bullet)
 
 
-def Draw_Winner(text, run):
+def Draw_Winner(text, keys_pressed):
     draw_text = WINNER_FONT.render(text, 1, WHITE)
     WIN.blit(draw_text, (WINDOW_WIDTH/2 - draw_text.get_width()/2, WINDOW_HEIGHT/2 - draw_text.get_height()/2))
     pygame.display.update()
-    run = False
+
     pygame.time.delay(5000) #in ms
+
     Main()
 
 def Main():
@@ -136,6 +135,9 @@ def Main():
 
     clock = pygame.time.Clock()
     run = True
+    pygame.event.clear()
+    winner_text = ""
+
     while run:
         clock.tick(FPS)                     #controls speed of the while loop
         for event in pygame.event.get():
@@ -156,7 +158,7 @@ def Main():
                 print("Yellow hit")
                 yellow_health -= 1
                 if yellow_health <= 0:
-                    winner_text = "Yellow Wins!"
+                    winner_text = "Red Wins!"
             if event.type == RED_HIT:
                 print("Red hit")
                 red_health -= 1
@@ -168,14 +170,14 @@ def Main():
         Yellow_movement(keys_pressed, yellow)
         Red_movement(keys_pressed, red)
 
-        Handle_bullets(yellow_bullets, red_bullets, yellow, red_health)
+        Handle_bullets(yellow_bullets, red_bullets, yellow, red)
 
         Draw_window(yellow, red, yellow_bullets, red_bullets, yellow_health, red_health)
 
         if(winner_text != ""):
             yellow_bullets = []
             red_bullets = []
-            Draw_Winner(winner_text, run)
+            Draw_Winner(winner_text, keys_pressed)
 
     pygame.quit()
 
